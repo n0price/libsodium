@@ -1,0 +1,39 @@
+name: Build Libsodium
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build-libsodium:
+    runs-on: ubuntu-20.04
+
+    steps:
+    # Checkout the code
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential automake autoconf libtool wget
+
+    # Download and build libsodium
+    - name: Build Libsodium
+      run: |
+        wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz
+        tar -xzf libsodium-1.0.18.tar.gz
+        cd libsodium-1.0.18
+        ./configure --prefix=$PWD/build
+        make
+        make install
+
+    # Upload the build as an artifact
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: libsodium-build
+        path: libsodium-1.0.18/build/
