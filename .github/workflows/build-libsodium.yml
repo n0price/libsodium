@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    # Checkout the code
+    # Checkout the forked repository
     - name: Checkout code
       uses: actions/checkout@v3
 
@@ -19,21 +19,20 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential automake autoconf libtool wget
+        sudo apt-get install -y build-essential automake autoconf libtool
 
-    # Download and build libsodium
+    # Build the forked libsodium
     - name: Build Libsodium
       run: |
-        wget https://download.libsodium.org/libsodium/releases/libsodium-1.0.18.tar.gz
-        tar -xzf libsodium-1.0.18.tar.gz
-        cd libsodium-1.0.18
+        ./autogen.sh
         ./configure --prefix=$PWD/build
         make
         make install
 
-    # Upload the build as an artifact
+    # Upload the build as an artifact using v4
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: libsodium-build
-        path: libsodium-1.0.18/build/
+        path: build/
+        include-hidden-files: true # Optional: Include hidden files if needed
